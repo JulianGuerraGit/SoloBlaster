@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: #242429;
+        }
+        
+        h1 {
+            color: white;
+            text-shadow: 2px 2px black;
+        }
+        
+        div {
+            text-align: center;
+        }
+        
+        #change_color {
+            background-color: rgb(2, 208, 2);
+            color: white;
+        }
+        
+        #Lightside {
+            background-color: Blue;
+            color: white;
+        }
+        
+        #Darkside {
+            background-color: red;
+            color: White;
+        }
+        
+        #rainbow {
+            padding: 14px 35px;
+            background: linear-gradient(238deg, #fd8800, #fd008f, #9700fd, #003dfd, #05c7e6, #4bd58d);
+            background-size: 1200% 1200%;
+            -webkit-animation: rainbow 10s ease infinite;
+            animation: rainbow 10s ease infinite;
+            color: White;
+            transition: 1s;
+        }
+        
+        @-webkit-keyframes rainbow {
+            0% {
+                background-position: 0% 50%
+            }
+            50% {
+                background-position: 100% 50%
+            }
+            100% {
+                background-position: 0% 50%
+            }
+        }
+        
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 50%
+            }
+            50% {
+                background-position: 100% 50%
+            }
+            100% {
+                background-position: 0% 50%
+            }
+        }
+        
+        #Fire {
+            background-color: rgb(153, 0, 255);
+            color: White;
+        }
+        
+        .container {
+            position: relative;
+            text-align: center;
+            color: white;
+            transform: translate(0.5%);
+            clip-path: inset(40px 0px 44px 0px round 50px);
+        }
+        /* Centered text */
+        
+        #Label {
+            color: white;
+            text-rendering: optimizeLegibility;
+        }
+        
+        .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        a {
+            text-shadow: 2px 2px black;
+            border-radius: 8px;
+            padding: 14px 25px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+    </style>
+    <link rel="icon" href="data:,">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"></script>
+</head>
+
+<body>
+    <div>
+        <div>
+            <h1>Blaster Control</h1>
+        </div>
+        <br>
+        <div>
+            <a class="button" id="Lightside" href="/setColor?r=255&g=0&b=0">Lightside</a>
+            <a class="button" id="Darkside" href="/setColor?r=0&g=255&b=0">Darkside</a>
+        </div>
+        <br>
+        <br>
+
+        <div><a class="btn btn-primary btn-lg" id="change_color" href="#">Change Color</a>
+            <br>
+            <br>
+            <br>
+            <input class="jscolor {onFineChange:'update(this)'}" id="rgb"></div>
+        <br><br>
+        <div>
+            <a class="button" id="rainbow" href="/rainbow">Rainbow</a>
+        </div>
+        <br><br>
+        <div>
+            <a class="button" id="Fire" href="/fire">Fire Blaster</a>
+        </div>
+        <br><br>
+        <div class="container">
+            <a class="Battery" id="Battery" href="/battery">
+                <img id="batteryImage" src="https://icon-library.com/images/battery-life-icon/battery-life-icon-8.jpg" alt="battery" width=200></img>
+                <div id="Label" class="centered">Battery<br>Status</div>
+            </a>
+        </div>
+        <script>
+            function update(picker) {
+                document.getElementById(' rgb ').innerHTML = Math.round(picker.rgb[0]) + ', ' + Math.round(picker.rgb[1]) + ', ' + Math.round(picker.rgb[2]);
+                document.getElementById("change_color ").href = "/setColor?r=" + Math.round(picker.rgb[0]) + " &g=" + Math.round(picker.rgb[1]) + " &b=" + Math.round(picker.rgb[2]);
+            }
+        </script>
+</body>
+
+</html>
