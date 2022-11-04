@@ -1,18 +1,24 @@
 #include <FastLED.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266WiFiMulti.h>
 #include <LittleFS.h>
+#include <ArduinoOTA.h>
 
 const char* ssid     = "xxxx";
 const char* password = "xxxx";
 
-const char* APssid     = "SoloBlaster";
-const char* APpassword = "Leia69";
+const char* APssid     = "Blaster";
+const char* APpassword = "Iloveleia69";
+
+//      POWER
+#define VOLTS 5
+#define MILLIAMPS 250
 
 #define TRIGGER_PIN 4
 
 #define LED_PIN     2
-#define NUM_LEDS    1
+#define NUM_LEDS    6
 
 CRGB led[NUM_LEDS];
 
@@ -53,31 +59,30 @@ float fVoltageMatrix[22][2] = {
 
 int i, perc;
 
-
 void setup() {
-
-  LittleFS.begin();
-
-  pinMode(A0, INPUT); 
-  
-  pinMode(TRIGGER_PIN, INPUT_PULLUP);
-  pinMode(LED_PIN, OUTPUT);
-  FastLED.addLeds<NEOPIXEL, LED_PIN>(led, NUM_LEDS);
-  
   i = 0;
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(APssid, APpassword);
-  delay(500);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(200);
     Serial.print(".");
-    if ( i >= 20 ) {  i=0;  break;  }
+    if ( i >= 5 ) {  i=0;  break;  }
     else {  i++;  }
   }
-  // Print local IP address and start web server
 
+  pinMode(A0, INPUT); 
+  pinMode(TRIGGER_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  
+  FastLED.addLeds<NEOPIXEL, LED_PIN>(led, NUM_LEDS);
+  FastLED.setMaxPowerInVoltsAndMilliamps(VOLTS, MILLIAMPS);
 
+  ArduinoOTA.setHostname(APssid);
+  ArduinoOTA.setPassword(password);
+
+  LittleFS.begin();
+  
   server.on("/", serverHomepage );
   server.on("/setColor", setLED);
   server.on("/rainbow", toggleRainbow);
@@ -85,6 +90,7 @@ void setup() {
   server.on("/fire", Fire);
   
   server.begin();
+  ArduinoOTA.begin();
 
 }
 
@@ -149,7 +155,7 @@ void handleLED(int r, int g, int b, bool rainbow, bool Fire) {
   if (TriggerState == LOW || Fire) {
     if (rainbow) { 
       fill_solid(led, NUM_LEDS, CHSV(hue, 255, 255)); 
-      EVERY_N_MILLISECONDS( 5 ) {  hue++; }
+      EVERY_N_MILLISECONDS( 5 ) {  hue+=2; }
     }
     else{ 
       fill_solid(led, NUM_LEDS, CRGB(r, g, b)); 
@@ -169,6 +175,8 @@ void handleLED(int r, int g, int b, bool rainbow, bool Fire) {
 void loop() {
 
   server.handleClient();
+  ArduinoOTA.handle();
   handleLED(r, g, b, rainbow, false);
+  
 
 }

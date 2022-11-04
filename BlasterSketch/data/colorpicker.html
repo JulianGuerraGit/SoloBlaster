@@ -71,7 +71,7 @@
             color: White;
         }
         
-        .container {
+        .Icon {
             position: relative;
             text-align: center;
             color: white;
@@ -109,7 +109,7 @@
 </head>
 
 <body>
-    <div>
+    <div class="Container">
         <div>
             <h1>Blaster Control</h1>
         </div>
@@ -121,7 +121,7 @@
         <br>
         <br>
 
-        <div><a class="btn btn-primary btn-lg" id="change_color" href="#">Change Color</a>
+        <div><a class="button" id="change_color" href="#">Change Color</a>
             <br>
             <br>
             <br>
@@ -135,7 +135,7 @@
             <a class="button" id="Fire" href="/fire">Fire Blaster</a>
         </div>
         <br><br>
-        <div class="container">
+        <div class="Icon">
             <a class="Battery" id="Battery" href="/battery">
                 <img id="batteryImage" src="https://icon-library.com/images/battery-life-icon/battery-life-icon-8.jpg" alt="battery" width=200></img>
                 <div id="Label" class="centered">Battery<br>Status</div>
@@ -143,10 +143,11 @@
         </div>
         <script>
             function update(picker) {
-                document.getElementById(' rgb ').innerHTML = Math.round(picker.rgb[0]) + ', ' + Math.round(picker.rgb[1]) + ', ' + Math.round(picker.rgb[2]);
-                document.getElementById("change_color ").href = "/setColor?r=" + Math.round(picker.rgb[0]) + " &g=" + Math.round(picker.rgb[1]) + " &b=" + Math.round(picker.rgb[2]);
+                document.getElementById("rgb").innerHTML = Math.round(picker.rgb[0]) + ', ' + Math.round(picker.rgb[1]) + ', ' + Math.round(picker.rgb[2]);
+                document.getElementById("change_color").href = "/setColor?r=" + Math.round(picker.rgb[0]) + "&g=" + Math.round(picker.rgb[1]) + "&b=" + Math.round(picker.rgb[2]);
             }
         </script>
+    </div>
 </body>
 
 </html>
