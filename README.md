@@ -4,7 +4,7 @@ I made a Han Solo replica blaster complete with an led to act as a blaster shot 
 ![image](https://github.com/scatmanspace/SoloBlaster/blob/master/Model/Render1.png)
 
 ## Description
-For this project i used an existing model by [PortedtoReality](https://www.thingiverse.com/thing:1915956) on thingiverse. I used the Wemod D1 Mini to control the leds and detect trigger pulls along with running the accesss point and webserver.
+For this project i used an existing model by [PortedtoReality](https://www.thingiverse.com/thing:1915956) on thingiverse. I used the Wemos D1 Mini to control the leds and detect trigger pulls along with running the accesss point and webserver.
 
 ### Model:
 I modified the original model using Fusion 360 for various purposes:
