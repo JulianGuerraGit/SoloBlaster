@@ -1,22 +1,25 @@
 #include <FastLED.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266WiFiMulti.h>
 #include <LittleFS.h>
 #include <ArduinoOTA.h>
 
+// WIFI SSID AND PASSWORD *OTA PASSWORD IS SAME AS WIFI PASSWORD*
 const char* ssid     = "xxxx";
 const char* password = "xxxx";
 
+// ACCESS POINT SSID AND PASSWORD
 const char* APssid     = "Blaster";
 const char* APpassword = "Iloveleia69";
 
-//      POWER
+// POWER LIMITS
 #define VOLTS 5
 #define MILLIAMPS 250
 
+// TRIGGER PIN ON WEMOS
 #define TRIGGER_PIN 4
 
+// LED PIN AND COUNT
 #define LED_PIN     2
 #define NUM_LEDS    6
 
@@ -24,6 +27,7 @@ CRGB led[NUM_LEDS];
 
 ESP8266WebServer server(80);
 
+// INITIAL COLOR AND STATE
 int r = 255;
 int g = 0;
 int b = 0;
@@ -32,6 +36,7 @@ uint8_t hue = 0;
 
 int TriggerState = 0;
 
+// VOLTAGE MATRIX TO MAP BATTERY VOLTAGES TO PERCENTAGES
 float fVoltageMatrix[22][2] = {
     {4.10, 100},
     {4.08, 95},
@@ -60,40 +65,49 @@ float fVoltageMatrix[22][2] = {
 int i, perc;
 
 void setup() {
-  i = 0;
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(APssid, APpassword);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+  
+  i = 0; // set i to 0 for wifi connect timeout
+  
+  WiFi.mode(WIFI_AP_STA); // Chooses both Access point mode and station mode
+  WiFi.softAP(APssid, APpassword); // Start access point
+  WiFi.begin(ssid, password); // begin wifi connection
+  while (WiFi.status() != WL_CONNECTED) { // wait while wifi connects
     delay(200);
     Serial.print(".");
-    if ( i >= 5 ) {  i=0;  break;  }
-    else {  i++;  }
+    if ( i >= 15 ) {  i=0;  break;  } // check if its been longer than 3 seconds
+    else {  i++;  } 
   }
 
+  // Pin setup
   pinMode(A0, INPUT); 
   pinMode(TRIGGER_PIN, INPUT_PULLUP);
   pinMode(LED_PIN, OUTPUT);
-  
+
+  // FastLED initialization
   FastLED.addLeds<NEOPIXEL, LED_PIN>(led, NUM_LEDS);
   FastLED.setMaxPowerInVoltsAndMilliamps(VOLTS, MILLIAMPS);
 
+  // OTA setup
   ArduinoOTA.setHostname(APssid);
   ArduinoOTA.setPassword(password);
 
+  // Begin filesystem
   LittleFS.begin();
-  
+
+  // setup webserver server responses
   server.on("/", serverHomepage );
   server.on("/setColor", setLED);
   server.on("/rainbow", toggleRainbow);
   server.on("/battery", checkBattery);
   server.on("/fire", Fire);
-  
+
+  // begin webserver and OTA
   server.begin();
   ArduinoOTA.begin();
 
 }
 
+// Access homepage html from file system and stream it to client.
 void serverHomepage() {
   File file = LittleFS.open("colorpicker.html", "r");
   server.streamFile(file, "text/html");
@@ -101,6 +115,7 @@ void serverHomepage() {
 
 }
 
+// Battery check calculations and HTML display
 void checkBattery() {
 
   int nVoltageRaw = analogRead(A0);
@@ -119,18 +134,20 @@ void checkBattery() {
   
 }
 
+// Webpage remote fire
 void Fire() {
   handleLED(r, g, b, rainbow, true);
   delay(250);
   serverHomepage();
-  
 }
 
+// Rainbow mode toggle
 void toggleRainbow() {
   rainbow = !rainbow;
   serverHomepage();
 }
 
+// Check how long trigger is held and toggle rainbow
 void triggerHold(bool clear) {
   if(clear && i!=0) { i = 0; }
   else if(i  >= 800) {  toggleRainbow();  i = 0;  }
@@ -138,16 +155,16 @@ void triggerHold(bool clear) {
   
 }
 
+// LED color change request
 void setLED() {
-
   r = server.arg("r").toInt();
   g = server.arg("g").toInt();
   b = server.arg("b").toInt();
   rainbow = false;
   serverHomepage();
-  
 }
 
+// LED firing animation/rainbow mode
 void handleLED(int r, int g, int b, bool rainbow, bool Fire) {
   
   TriggerState = digitalRead(TRIGGER_PIN);
@@ -172,11 +189,9 @@ void handleLED(int r, int g, int b, bool rainbow, bool Fire) {
   
 }
 
+// Main Loop
 void loop() {
-
   server.handleClient();
   ArduinoOTA.handle();
   handleLED(r, g, b, rainbow, false);
-  
-
 }
